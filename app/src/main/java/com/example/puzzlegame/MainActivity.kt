@@ -5,7 +5,7 @@ import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -22,7 +22,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -30,10 +29,12 @@ import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
+    var bitmap: Bitmap? = null
     var imageFile:File? = null
     var mCurrentPhotoPath: String? = null
     var mUri: UriForIntent? = null
     private var requestCode: Int? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -180,60 +181,32 @@ class MainActivity : AppCompatActivity() {
                 REQUEST_IMAGE_CAPTURE
             )
         } else {
-            var intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            if (intent.resolveActivity(packageManager) != null) {
-                var photoFile: File? = null
-                try {
-                    photoFile = createImageFile()
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                    Toast.makeText(this@MainActivity, e.message, Toast.LENGTH_SHORT).show()
-                }
-                if (photoFile != null) {
-                    val photoUri = FileProvider.getUriForFile(
-                        this@MainActivity,
-                        BuildConfig.APPLICATION_ID,
-                        photoFile
-                    )
-                    mUri = UriForIntent(photoUri)
-                    val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, bitmap)
-
-                }
-            }
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+//            if (intent.resolveActivity(packageManager) != null) {
+//                var photoFile: File? = null
+//                try {
+//                    photoFile = createImageFile()
+//                } catch (e: IOException) {
+//                    e.printStackTrace()
+//                    Toast.makeText(this@MainActivity, e.message, Toast.LENGTH_SHORT).show()
+//                }
+//                if (photoFile != null) {
+//                    val photoUri = FileProvider.getUriForFile(
+//                        this@MainActivity,
+//                        BuildConfig.APPLICATION_ID,
+//                        photoFile
+//                    )
+//                    mUri = UriForIntent(photoUri)
+//                    val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
+//                    intent.putExtra(MediaStore.EXTRA_OUTPUT, bitmap)
+//
+//                }
+//            }
             startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
         }
     }
 
-//        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-////        startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
-//        if (intent.resolveActivity(packageManager) != null) {
-//            var photoFile: File? = null
-//            try {
-//                photoFile = createImageFile()
-//            } catch (e: IOException) {
-//                e.printStackTrace()
-//                Toast.makeText(this@MainActivity, e.message, Toast.LENGTH_SHORT).show()
-//            }
-//            if (photoFile != null) {
-//                val photoUri = FileProvider.getUriForFile(
-//                    this@MainActivity,
-//                    BuildConfig.APPLICATION_ID,
-//                    photoFile
-//                )
-//                mUri = UriForIntent(photoUri)
-////                val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
-//                intent.putExtra(MediaStore.EXTRA_OUTPUT, mUri)
-//                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
-//            }
-//        }
-//    else {
-//            ActivityCompat.requestPermissions(
-//                this, arrayOf(Manifest.permission.CAMERA),
-//                REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE
-//            )
-//        }
-//    }
+
 
 
     @Throws(IOException::class)
@@ -296,8 +269,8 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this@MainActivity, PuzzleActivity::class.java)
 
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            val uri = data!!.data
-            intent.putExtra("mCurrentPhotoPath", uri.toString())
+            bitmap = data?.extras?.get("data") as Bitmap
+            intent.putExtra("mCurrentPhoto", bitmap)
             startActivity(intent)
         }
         if (requestCode == REQUEST_IMAGE_GALLERY && resultCode == RESULT_OK) {

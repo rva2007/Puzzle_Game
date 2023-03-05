@@ -17,7 +17,7 @@ import kotlin.random.Random
 
 class PuzzleActivity : AppCompatActivity() {
     var pieces: ArrayList<PuzzlePiece>? = null
-    var mCurrentPhotoPath: String? = null
+    var mCurrentPhoto: Bitmap? = null
     var mCurrentPhotoUri: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,7 +32,7 @@ class PuzzleActivity : AppCompatActivity() {
 
         val intent = intent
         val assetName = intent.getStringExtra("assetName")
-        mCurrentPhotoPath = intent.getStringExtra("mCurrentPhotoPath")
+        mCurrentPhoto = intent.getParcelableExtra<Bitmap>("mCurrentPhoto")
         mCurrentPhotoUri = intent.getStringExtra("mCurrentPhotoUri")
 
         //run image related code after the view was laid out to have all dimensions calculated
@@ -41,16 +41,12 @@ class PuzzleActivity : AppCompatActivity() {
                 Log.d("MyLog", "in PuzzleActivity " + assetName)
                 setPicFromAsset(assetName, imageView)
 
-            } else if (mCurrentPhotoPath != null) {
-                setPicFromPfotoPath(mCurrentPhotoPath!!, imageView)
-//
-//                imageView.setImageURI(null)
-//                imageView.setImageURI(Uri.parse(mCurrentPhotoPath))
-
-
+            } else if (mCurrentPhoto != null) {
+                imageView.setImageBitmap(mCurrentPhoto)
 
             } else if (mCurrentPhotoUri != null) {
                 imageView.setImageURI(Uri.parse(mCurrentPhotoUri))
+
             }
             pieces = splitImage(imageView)
 
